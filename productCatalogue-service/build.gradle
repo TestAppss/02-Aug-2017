@@ -1,0 +1,118 @@
+plugins {
+	id 'net.ltgt.apt' version '0.10'
+    	id 'org.springframework.boot' version '1.5.4.RELEASE'
+}
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'eclipse'
+apply plugin: 'eclipse-wtp'
+apply plugin: 'groovy'
+apply plugin: 'jetty'
+apply plugin: "net.ltgt.apt"
+apply plugin: "org.springframework.boot"
+bootRepackage.enabled = false
+
+
+def jdkVersion = 1.8
+
+sourceCompatibility = jdkVersion
+targetCompatibility = jdkVersion
+
+jettyRun {
+	 httpPort = 8080
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets.all { set ->
+    def jarTask = task("${set.name}Jar", type: Jar) {
+        baseName = baseName + "-$set.name"
+        from set.output
+    }
+
+    artifacts {
+        archives jarTask
+    }
+}
+
+
+dependencies{
+	
+	 def springpluginCore="1.2.0.RELEASE"
+	 def hibernateVersion="5.2.10.Final"
+	 def sqlServerVersion="6.1.7.jre8-preview"
+	 def springfoxSwaggerVersion="2.7.0"
+	 def springfoxSwaggerUiVersion="2.7.0"
+	 def jsonPathVersion="2.2.0"
+	 def jsonSchemaVersion="2.6.3"
+	 def junitVersion="4.9"
+	 def mapstructVersion="1.1.0.Final"
+	 def mapstructProcessorVersion="1.1.0.Final"
+	 
+	  // Infra dependency
+	 compile project(':microservices-infrastructure')
+
+	 //spring dependencies
+	 compile("org.springframework.boot:spring-boot-starter-hateoas")
+	 compile ("org.springframework.boot:spring-boot-starter-web")
+	 
+	{
+		 exclude module: 'spring-boot-starter-tomcat'
+	 }
+	compile('org.springframework.boot:spring-boot-starter-jetty')
+     compile ("org.springframework.boot:spring-boot-starter-data-jpa")
+	 compile group: 'org.springframework.plugin', name: 'spring-plugin-core', version: "${springpluginCore}"
+	 
+	 //datasource dependencies
+	 compile group: 'org.hibernate', name: 'hibernate-gradle-plugin', version: "${hibernateVersion}"
+	 compile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version:"${sqlServerVersion}"
+	 compile ("org.springframework.boot:spring-boot-starter-data-mongodb")
+
+	 
+	 //swagger springfox dependencies
+	 compile group: 'io.springfox', name: 'springfox-swagger2', version: "${springfoxSwaggerVersion}"
+	 compile group: 'io.springfox', name: 'springfox-swagger-ui', version: "${springfoxSwaggerUiVersion}"
+	 
+	 //other dependencies
+	 compile group: 'com.jayway.jsonpath', name: 'json-path', version: "${jsonPathVersion}"
+	 compile group: 'org.mapstruct', name: 'mapstruct-jdk8', version: "${mapstructVersion}"
+	 compile group: 'org.mapstruct', name: 'mapstruct-processor', version: "${mapstructVersion}"
+	  
+	  providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
+	 compile "com.fasterxml.jackson.module:jackson-module-jsonSchema:$jsonSchemaVersion"	
+	 compile "com.fasterxml.jackson.core:jackson-databind:"
+
+	
+	 
+	 //test dependencies
+	  testCompile 'junit:junit:4.9'
+}
+war {
+    from('src/main/resources') {
+        include 'application.properties'
+    }
+}
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+        output.classesDir   = 'build/classes/main/java'
+    	output.resourcesDir = 'build/classes/main/resources'
+    }
+    test {
+        java {
+            srcDir 'src/test/java'
+        }
+        resources {
+            srcDir 'src/test/resources'
+        }
+        output.classesDir   = 'build/classes/test/java'
+        output.resourcesDir = 'build/classes/test/resources'
+   	}
+}

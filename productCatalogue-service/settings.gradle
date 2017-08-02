@@ -1,0 +1,2 @@
+include ":microservices-infrastructure"
+project(':microservices-infrastructure').projectDir = file('../microservices-infrastructure')

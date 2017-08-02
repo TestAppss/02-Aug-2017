@@ -1,0 +1,9 @@
+applications:
+- path: build/libs/microservices-1.0.war
+  memory: 1024M
+  instances: 1
+  domain: mybluemix.net
+  name: microservices
+  host: microservices
+  disk_quota: 1024M
+  buildpack: java_buildpack
